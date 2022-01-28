@@ -7,6 +7,10 @@
   transform: translateY(-50%);
 }
 
+.container-img-col {
+  display: flex;
+}
+
 .container strong {
   font-size: 20px;
   line-height: 26px;
@@ -21,4 +25,26 @@
 
 .container a {
   text-decoration: none;
+}
+
+ion-card {
+  --background: transparent;
+}
+
+ion-card-content {
+  padding: 0 !important;
+}
+
+img {     
+  border: 1px solid rgba(255, 255, 255, 0.411) !important;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 5px;
+}
+
+.item-video-list {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
 }
