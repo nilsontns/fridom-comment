@@ -23,7 +23,7 @@ const Home: React.FC = () => {
         id: i + 1,
         name: `video ${i + 1}`,
         description: `description video ${i + 1}`,
-        url: "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1",
+        url: "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1",
         img: arrImg[i],
       };
       data.push(obj);
