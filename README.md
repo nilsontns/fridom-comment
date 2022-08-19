@@ -10,6 +10,9 @@
 - ⚡ Fun fact **I like to learn and have fun in what I do**
 
 
+** important: To run the test mode (locally) I recommend that you use a version of node greater than v14.
+
+
 - Follow the next steps:
 
 1. npm install
