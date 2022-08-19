@@ -4,7 +4,6 @@ import {
   IonItem,
   IonLabel,
   IonSkeletonText,
-  IonThumbnail,
   IonInput,
   IonCard,
   IonCardContent,
@@ -12,18 +11,18 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  useIonModal,
+  IonTextarea,
+  IonButton,
 } from "@ionic/react";
-import Modal from "./Modal";
-interface ContainerProps {
-  data: any;
-}
+import moment from "moment";
 
-const ExploreContainer: React.FC<ContainerProps> = ({ data }: any) => {
+const ExploreContainer: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectItem, setSelectItem] = useState<any>({});
-  const [temp, setTeamp] = useState<any>([...data]);
+  const [temp, setTeamp] = useState<any>([]);
   const [text, setText] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [dataComments, setDataComments] = useState<any>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -33,89 +32,137 @@ const ExploreContainer: React.FC<ContainerProps> = ({ data }: any) => {
   }, []);
 
   useEffect(() => {
-    if (text && text != "") {
-      const result: any = data.filter((e: any) =>
+    if (text && text !== "") {
+      const result: any = temp.filter((e: any) =>
         e.name.toLowerCase().includes(text.toLowerCase())
       );
-      setTeamp([...result]);
+      setDataComments([...result]);
     } else {
-      setTeamp([...data]);
+      setDataComments([...temp]);
     }
-  }, [text]);
+  }, [temp, text]);
 
-  const openModal = (item: any) => {
-    console.log(item);
-    setSelectItem(item);
-    present({
-      cssClass: "my-class",
-    });
+  const handlerSend = () => {
+    const obj = {
+      name,
+      description,
+      time: moment().format("DD-MM-YYYY - kk:mm"),
+      timestamp: moment().unix(),
+    };
+    setDescription("");
+    setName("");
+    setTeamp([...temp, obj]);
+    setDataComments([...temp, obj]);
   };
-
-  const handleDismiss = () => {
-    setSelectItem({});
-    dismiss();
-  };
-
-  const [present, dismiss] = useIonModal(Modal, {
-    data: selectItem,
-    onDismiss: handleDismiss,
-  });
 
   return (
-    <div>
-      {loading && (
-        <>
-          {Array.from(Array(6)).map((val, i) => (
-            <IonList key={`key-card-video-${i}`}>
-              <IonItem>
-                <IonThumbnail slot="start">
-                  <IonSkeletonText animated />
-                </IonThumbnail>
-                <IonLabel>
-                  <h3>
-                    <IonSkeletonText animated style={{ width: "50%" }} />
-                  </h3>
-                  <p>
-                    <IonSkeletonText animated style={{ width: "80%" }} />
-                  </p>
-                  <p>
-                    <IonSkeletonText animated style={{ width: "60%" }} />
-                  </p>
-                </IonLabel>
-              </IonItem>
-            </IonList>
-          ))}
-        </>
-      )}
-      {!loading && (
-        <>
-          <IonItem>
-            <IonInput
-              value={text}
-              placeholder="Buscar video"
-              onIonChange={(e) => setText(e.detail.value!)}
-            ></IonInput>
-          </IonItem>
-
-          {temp.map(({ img, name, description, url }: any) => (
-            <IonCard onClick={() => openModal({ name, description, url })}>
+    <div className="contianer-main">
+      <div className="container-comments">
+        {loading && (
+          <>
+            {Array.from(Array(6)).map((val, i) => (
+              <IonList key={`key-card-video-${i}`}>
+                <IonItem>
+                  <IonLabel>
+                    <h3>
+                      <IonSkeletonText animated style={{ width: "50%" }} />
+                    </h3>
+                    <p>
+                      <IonSkeletonText animated style={{ width: "80%" }} />
+                    </p>
+                    <p>
+                      <IonSkeletonText animated style={{ width: "60%" }} />
+                    </p>
+                  </IonLabel>
+                </IonItem>
+              </IonList>
+            ))}
+          </>
+        )}
+        {!loading && (
+          <>
+            <IonCard>
               <IonCardContent>
-                <IonGrid>
-                  <IonRow>
-                    <IonCol className="container-img-col" size="2">
-                      <img src={img} alt="" />
-                    </IonCol>
-                    <IonCol class="item-video-list" size="6">
-                      <p>{name}</p>
-                      <p>{description}</p>
-                    </IonCol>
-                  </IonRow>
-                </IonGrid>
+                <IonItem>
+                  <IonLabel position="floating">Nombre del Autor</IonLabel>
+                  <IonInput
+                    value={name}
+                    onIonChange={(e) => setName(e.detail.value!)}
+                  ></IonInput>
+                </IonItem>
+                <IonItem>
+                  <IonLabel position="stacked">Comentario</IonLabel>
+                  <IonTextarea
+                    value={description}
+                    onIonChange={(e) => setDescription(e.detail.value!)}
+                  ></IonTextarea>
+                </IonItem>
+
+                <IonItem>
+                  <div className="send-content" >
+                  <IonButton className="btn-send" onClick={handlerSend}>
+                    {" "}
+                    Enviar{" "}
+                  </IonButton>
+                  </div>
+                </IonItem>
               </IonCardContent>
             </IonCard>
-          ))}
-        </>
-      )}
+
+            <IonItem className="search-item" >
+              <div>
+                <IonInput
+                  value={text}
+                  placeholder="Buscar Comentario"
+                  onIonChange={(e) => setText(e.detail.value!)}
+                ></IonInput>
+              </div>
+            </IonItem>
+
+            {dataComments.length > 0 && (
+              <>
+                {dataComments
+                  .sort((objA: any, objB: any) =>   Number(objB.timestamp) -  Number(objA.timestamp))
+                  .map(({ name, description, time, timestamp }: any) => (
+                    <IonCard key={`${name}-${time}`}>
+                      <IonCardContent>
+                        <IonGrid> 
+                          <IonRow>
+                            <IonCol class="item-video-list" size="10">
+                              <p className="name">{name}</p>
+                              <p className="description">{description}</p>
+                            </IonCol>
+                            <IonCol className="container-img-col" size="2">
+                              <p>
+                                {" "}
+                                {moment(parseInt(`${timestamp}000`)).format(
+                                  "DD-MM-YYYY - kk:mm:ss"
+                                )}
+                              </p>
+                            </IonCol>
+                          </IonRow>
+                        </IonGrid>
+                      </IonCardContent>
+                    </IonCard>
+                  ))}
+              </>
+            )}
+            {!dataComments.length && (
+              <IonCard>
+                <IonCardContent>
+                  <IonGrid>
+                    <IonRow>
+                      <IonCol class="item-video-list" size="6">
+                        <p>No hay comentarios</p>
+                      </IonCol>
+                    </IonRow>
+                  </IonGrid>
+                </IonCardContent>
+              </IonCard>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };
